@@ -4,12 +4,28 @@ import Phonebook from './Phonebook/Phonebook';
 import Contacts from './Contacts/Contacts';
 import Filter from './Filter/Filter';
 import { nanoid } from 'nanoid';
+import { saveTolS, getFromLS } from './helpers/localeStorage';
 
 export class App extends Component {
   state = {
     contacts: [],
     filter: '',
   };
+
+  componentDidMount() {
+    if (getFromLS('contacts')) {
+      this.setState({
+        contacts: getFromLS('contacts'),
+      });
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.contacts.length !== this.state.contacts.length) {
+      saveTolS('contacts', this.state.contacts);
+      this.setState({ contacts: getFromLS('contacts') });
+    }
+  }
 
   createContact = data => {
     const user = {
@@ -19,7 +35,6 @@ export class App extends Component {
     this.setState(prevState => ({
       contacts: [...prevState.contacts, user],
     }));
-    console.log(user);
   };
 
   handleFilter = ({ target }) => {
